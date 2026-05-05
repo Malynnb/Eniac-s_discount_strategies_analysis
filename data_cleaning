@@ -1,0 +1,130 @@
+import pandas as pd
+
+orders = pd.read_csv(base_path + 'orders.csv')
+orderlines = pd.read_csv(base_path + 'orderlines.csv')
+products = pd.read_csv(base_path + 'products.csv')
+brands = pd.read_csv(base_path + 'brands.csv')
+
+
+orders_backup = orders.copy()
+orderlines_backup = orderlines.copy()
+products_backup = products.copy()
+brands_backup = brands.copy()
+
+  #remove dup skus
+product_df = product_df.drop_duplicates(subset='sku')
+print(product_df.shape)
+
+  #drop unused column
+product_df = product_df.drop(columns=['promo_price', 'in_stock'])
+print(product_df.shape)
+
+  #remove rows with '. in price
+product_df = product_df[
+    ~product_df['price'].astype(str).str.contains(r'\.\.')
+]
+print(product_df.shape)
+
+#convert price
+product_df['price'] = pd.to_numeric(product_df['price'], errors='coerce')
+
+  #drop nan
+product_df = product_df.dropna()
+print(product_df.shape)
+
+
+  print(product_df['name'].isna().sum())
+print((product_df['name'].str.strip() == '').sum())
+print(product_df['sku'].duplicated().sum())
+
+  # sort so we keep the most relevant version (highest price)
+product_df = product_df.sort_values('price', ascending=False)
+
+# remove duplicate product names
+product_df = product_df.drop_duplicates(subset='name', keep='first')
+
+print(product_df.shape)
+
+
+  order_df = orders.copy()
+
+  order_df = order_df[order_df['state'] == 'Completed']
+print(order_df.shape)
+
+  valid_orders = orderlines['id_order'].unique()
+
+order_df = order_df[
+    order_df['order_id'].isin(valid_orders)
+]
+
+print(order_df.shape)
+
+
+  order_df = order_df[
+    order_df['order_id'].isin(orderlines['id_order'])
+]
+
+
+
+  orderline_df = orderlines.copy()
+
+
+  orderline_df = orderlines.copy()
+print(orderline_df.shape)
+
+
+  #drop product id
+orderline_df = orderline_df.drop(columns=['product_id'])
+print(orderline_df.shape)
+
+  #convert unit price
+orderline_df['unit_price'] = pd.to_numeric(orderline_df['unit_price'], errors='coerce')
+
+  #drop nan
+orderline_df = orderline_df.dropna(subset=['unit_price'])
+print(orderline_df.shape)
+
+
+  #remove odd value
+orderline_df = orderline_df[
+    (orderline_df['unit_price'] > 0) &
+    (orderline_df['product_quantity'] > 0)
+]
+print(orderline_df.shape)
+
+  #rename column
+orderline_df = orderline_df.rename(columns={
+    'id_order': 'order_id',
+    'product_quantity': 'quantity'
+})
+
+
+  #convert date
+orderline_df['date'] = pd.to_datetime(orderline_df['date'])
+
+  #keep only valid order
+orderline_df = orderline_df[
+    orderline_df['order_id'].isin(orders['order_id'])
+]
+print(orderline_df.shape)
+
+  order_df = orders.copy()
+
+order_df = order_df[order_df['state'] == 'Completed']
+order_df = order_df.drop(columns=['state'])
+order_df = order_df.dropna()
+
+print(order_df.shape)
+
+
+  orderline_df = orderline_df[
+    orderline_df['order_id'].isin(order_df['order_id'])
+]
+
+print(orderline_df.shape)
+
+  #merge with products
+temp = orderline_df.merge(product_df[['sku', 'price']], on='sku', how='left')
+
+  
+  
