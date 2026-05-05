@@ -31,3 +31,10 @@ Discount strategy effectiveness varies across product categories
 
 # Presentation
 
+
+git add .
+git commit -m "add revenue chart"
+git push
+
+![Revenue Chart](visuals/revenue_chart.png)
+
