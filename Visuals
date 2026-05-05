@@ -1,5 +1,5 @@
-git add visuals/revenue_chart.png
-git commit -m "add image"
+git add .
+git commit -m "add revenue chart"
 git push
 
 ![Revenue Chart](visuals/revenue_chart.png)
