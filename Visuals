@@ -1,0 +1,6 @@
+cd ~/discount-strategy-analysis
+git add visuals/revenue_chart.png
+git commit -m "Add revenue chart"
+git push
+
+![Revenue Chart](visuals/revenue_chart.png)
