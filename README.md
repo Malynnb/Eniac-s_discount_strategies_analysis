@@ -28,3 +28,6 @@ Most products are discounted, but not all discounts increase revenue
 Mid-range discounts often perform better than extreme discounts
 Some products generate high revenue without heavy discounts
 Discount strategy effectiveness varies across product categories
+
+# Presentation
+
