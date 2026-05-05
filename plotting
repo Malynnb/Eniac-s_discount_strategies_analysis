@@ -1,0 +1,169 @@
+df = orderline_df.merge(order_df, on='order_id')
+df = df.merge(product_df, on='sku')
+
+df['month'] = df['created_date'].dt.to_period('M')
+
+revenue_month = df.groupby('month')['total_paid'].sum()
+
+revenue_month.plot(kind='line', figsize=(10,5), title='Monthly Revenue')
+
+df['month'] = df['created_date'].dt.to_period('M').astype(str)
+
+revenue_month = df.groupby('month')['total_paid'].sum()
+import matplotlib.pyplot as plt
+
+revenue_month.plot(kind='bar', figsize=(12,5))
+
+plt.title('Monthly Revenue')
+plt.xlabel('Month')
+plt.ylabel('Revenue')
+plt.xticks(rotation=45)
+
+plt.tight_layout()
+plt.show()
+
+revenue_month_m = revenue_month / 1_000_000
+
+import matplotlib.pyplot as plt
+
+revenue_month_m.plot(kind='bar', figsize=(12,5))
+
+plt.title('Monthly Revenue (€ Million)')
+plt.xlabel('Month')
+plt.ylabel('Revenue (€M)')
+plt.xticks(rotation=45)
+
+plt.tight_layout()
+plt.show()
+
+#top products by revenue
+top_products_rev = df.groupby('name')['total_paid'].sum().sort_values(ascending=False).head(10)
+
+top_products_rev.plot(kind='bar', figsize=(10,5), title='Top 10 Products by Revenue')
+
+#top products by orders count
+top_products_orders = df.groupby('name')['order_id'].nunique().sort_values(ascending=False).head(10)
+
+top_products_orders.plot(kind='bar', figsize=(6,4), title='Top 10 Products by Order Count')
+
+
+
+import re  # used for regex (pattern matching)
+
+def categorize_product(row):
+    # convert name + description to lowercase text (avoid case issues)
+    name = str(row['name']).lower()          # product name
+    desc = str(row['desc']).lower()          # product description
+    text = name + ' ' + desc                 # combine both for broader search
+    
+    price = float(row['price'])              # ensure price is numeric
+
+    # -------------------------
+    # 1. iPhones
+    # -------------------------
+    # if "iphone" appears in the name AND price is high → it's a real iPhone
+    if re.search(r'iphone', name) and price > 300:
+        return "iPhone"
+
+    # -------------------------
+    # 2. laptop / desktop / tablet
+    # -------------------------
+    # iPads (only if not cheap accessories)
+    if re.search(r'ipad', name) and price > 250:
+        return "laptop_desktop_tablet"
+
+    # MacBooks (higher price threshold)
+    if re.search(r'macbook', name) and price > 700:
+        return "laptop_desktop_tablet"
+
+    # Desktop Macs
+    if re.search(r'imac|mac mini|mac pro', name) and price > 400:
+        return "laptop_desktop_tablet"
+
+    # -------------------------
+    # 3. servers
+    # -------------------------
+    # known server brands
+    if re.search(r'synology|qnap|rackstation', name):
+        return "servers"
+
+    # NAS devices (Network Attached Storage)
+    if re.search(r'\bnas\b', name) and price > 200:
+        return "servers"
+
+    # -------------------------
+    # 4. storage
+    # -------------------------
+    # external drives / branded storage products
+    if re.search(r'raid|thunderbay|pegasus|g.?speed|my passport|my book'
+                 r'|g.?drive|lacie|seagate backup|external.{0,20}(drive|disk)', text):
+        return "storage"
+
+    # SSD / HDD but exclude accessories like cases or repair kits
+    if re.search(r'\bssd\b|\bhdd\b|hard drive|solid state', name) and \
+       not re.search(r'case|enclosure|repair|kit', name):
+        return "storage"
+
+    # RAM / memory modules
+    if re.search(r'\bdimm\b|so-dimm|ddr[234]|mac memory|owc memory|fcm memory'
+                 r'|crucial.{0,10}memory|kingston.{0,10}memory|\d+gb.{0,10}ddr', name):
+        return "storage"
+
+    # -------------------------
+    # 5. monitors
+    # -------------------------
+    # detect monitors via keywords or known brands
+    if re.search(r'\bmonitor\b|benq|\bdell\b.{0,20}\d+["\']|lg\s+\d+[a-z]|eizo', name):
+        return "monitor"
+
+    # -------------------------
+    # 6. audio
+    # -------------------------
+    # headphones, speakers, microphones, etc.
+    if re.search(r'speaker|headphone|headset|earphone|earbud|microphone'
+                 r'|bose|beats|jabra|jbl|soundlink|soundtouch', text):
+        return "audio"
+
+    # -------------------------
+    # 7. phone accessories
+    # -------------------------
+    # iPhone-related BUT low price → accessory (not actual phone)
+    if re.search(r'iphone|ipod|lightning', text) and price < 300:
+        return "phone_accessory"
+
+    # -------------------------
+    # 8. computer accessories
+    # -------------------------
+    # Mac/iPad-related AND low price → accessory like charger, cable, etc.
+    if re.search(r'ipad|macbook|imac|mac mini|mac pro|\bmac\b', text) and price < 700:
+        if re.search(r'case|cover|sleeve|stand|hub|adapter|cable|charger|keyboard|dock', text):
+            return "computer_accessory"
+
+    # -------------------------
+    # 9. fallback
+    # -------------------------
+    # if nothing matches → classify as "other"
+    return "other"
+
+
+    # apply function row-by-row to create new category column
+df['category'] = df.apply(categorize_product, axis=1)
+
+# avoid errors if missing values exist
+df['desc'] = df['desc'].fillna('')
+df['price'] = df['price'].fillna(0)
+
+
+#vertical
+rev_cat.plot(kind='bar')
+plt.title('Revenue by Category')
+plt.xlabel('Category')
+plt.ylabel('Revenue')
+
+plt.xticks(rotation=30, ha='right')  # slight tilt + alignment
+plt.tight_layout()
+
+plt.show()
+
+
+
