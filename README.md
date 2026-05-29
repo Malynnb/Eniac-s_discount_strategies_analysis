@@ -1,149 +1,130 @@
 # Eniac Discount Strategy Analysis
 
-## Project Overview
+## Overview
 
-This project analyzes how discount strategies impact revenue, sales performance, and product demand within an e-commerce dataset.
+This project analyzes how discount strategies impact revenue, order volume, and product performance using Eniac's e-commerce sales data.
 
-The objective was to determine whether discounts effectively drive sales growth, identify optimal discount ranges, and understand how pricing strategies influence different products and categories.
-
----
-
-## Business Problem
-
-Discounting is a common strategy used to increase sales, but excessive discounts can reduce profitability without generating meaningful growth.
-
-This analysis investigates whether higher discounts actually lead to better business outcomes and identifies patterns that can help optimize promotional strategies.
-
----
-
-## Project Structure
-
-```text
-Eniac_Discount_Strategy_Analysis/
-│
-├── data/
-│   ├── raw_data.csv
-│   └── cleaned_data.csv
-│
-├── notebooks/
-│   └── discount_analysis.ipynb
-│
-├── presentation/
-│   └── project_presentation.pdf
-│
-├── images/
-│   └── visualizations
-│
-└── README.md
-```
-
----
-
-## Dataset Overview
-
-| Dataset Component    | Description                                                  |
-| -------------------- | ------------------------------------------------------------ |
-| Products             | Product information and pricing                              |
-| Orders               | Customer order transactions                                  |
-| Sales Metrics        | Revenue and order performance data                           |
-| Discount Information | Original prices, discounted prices, and discount percentages |
+By combining product, order, and orderline datasets, the analysis evaluates whether discounts effectively drive sales and identifies pricing strategies that maximize business performance.
 
 ---
 
 ## Business Questions
 
 * How much are products discounted on average?
-* Do larger discounts generate higher revenue?
-* How does discount percentage affect order volume?
-* Which products benefit most from discounting?
-* Which categories perform well without significant discounts?
-* Is there an optimal discount range that balances sales performance and revenue generation?
+* Do higher discounts lead to higher revenue?
+* Which products and categories benefit most from discounts?
+* Are there optimal discount ranges?
+* Can some products maintain strong sales performance without significant discounts?
 
 ---
 
-## Data Cleaning
+## Dataset
 
-* Removed missing and inconsistent price values
-* Converted date columns into datetime format
-* Handled pricing outliers
-* Validated relationships between product and order datasets
-* Standardized data formats
-* Ensured data consistency across tables
+The analysis combines data from multiple sources:
+
+| Table      | Description                      |
+| ---------- | -------------------------------- |
+| Orders     | Customer order information       |
+| Orderlines | Product-level order transactions |
+| Products   | Product catalog and pricing data |
+| Brands     | Product brand information        |
+
+---
+
+## Data Preparation
+
+Several cleaning and validation steps were performed before analysis:
+
+### Product Data
+
+* Removed duplicate SKUs
+* Removed duplicate product names
+* Dropped unused columns
+* Removed invalid price values
+* Converted prices to numeric format
+* Removed missing values
+
+### Order Data
+
+* Filtered for completed orders only
+* Removed incomplete records
+* Validated order IDs against transaction data
+
+### Orderline Data
+
+* Removed unnecessary columns
+* Converted prices to numeric format
+* Removed invalid quantities and prices
+* Standardized column names
+* Converted dates to datetime format
+* Retained only valid orders
+
+### Data Integration
+
+* Merged product and transaction data using SKU identifiers
+* Linked orders, products, and orderlines into a unified analytical dataset
 
 ---
 
 ## Feature Engineering
 
-### Created Features
+To measure discount effectiveness, additional variables were created:
 
-| Feature       | Description                                         |
-| ------------- | --------------------------------------------------- |
-| discount      | Absolute difference between original and sale price |
-| discount_pct  | Percentage discount applied to a product            |
-| discount_tier | Classification of discount intensity                |
+| Feature         | Description                                  |
+| --------------- | -------------------------------------------- |
+| `discount`      | Difference between list price and sale price |
+| `discount_pct`  | Percentage discount applied                  |
+| `discount_tier` | Discount category used for comparison        |
 
 ### Discount Categories
 
-| Tier   | Discount Range |
-| ------ | -------------- |
-| Low    | < 10%          |
-| Medium | 10% – 25%      |
-| High   | > 25%          |
+| Tier   | Range  |
+| ------ | ------ |
+| Low    | < 10%  |
+| Medium | 10–25% |
+| High   | > 25%  |
 
 ---
 
-## Exploratory Data Analysis
+## Analysis
 
-The analysis explored:
+The project explores:
 
-* Distribution of discounts across products
-* Revenue generated by discount level
-* Order volume by discount category
-* Product-level performance
-* Category-level performance
-* Relationship between discount percentage and revenue
+* Discount distribution across products
+* Revenue by discount level
+* Product performance under different discount strategies
+* Category-level discount effectiveness
+* Relationships between discounts and sales outcomes
 
 ---
 
 ## Key Findings
 
-* Most products were sold with some level of discount.
-* Larger discounts did not always generate higher revenue.
-* Medium discount ranges often achieved stronger performance.
-* Some products maintained high revenue without significant discounting.
-* Discount effectiveness varied across categories.
-* Product-specific pricing strategies may outperform blanket discount policies.
+* Most products were sold with some level of discounting.
+* Higher discounts did not consistently generate higher revenue.
+* Moderate discount ranges often outperformed aggressive discounts.
+* Several products maintained strong performance without heavy discounting.
+* Discount effectiveness varied across product categories.
+* Product-specific pricing strategies may be more effective than blanket discount policies.
+
+---
+
+## Tools
+
+* Python
+* Pandas
+* Jupyter Notebook
 
 ---
 
 ## Skills Demonstrated
 
-* Python
-* Pandas
-* Data Cleaning
-* Exploratory Data Analysis (EDA)
-* Feature Engineering
-* Data Visualization
-* Business Analysis
-* Revenue Analysis
-* Data Storytelling
-
----
-
-## Business Recommendations
-
-Based on the findings:
-
-1. Avoid applying large discounts across all products.
-2. Test moderate discount ranges before implementing aggressive promotions.
-3. Develop category-specific pricing strategies.
-4. Identify products that perform well without discounts and preserve margins where possible.
-5. Use data-driven experimentation to optimize future promotional campaigns.
+`Data Cleaning` • `Data Validation` • `Data Transformation` • `Data Merging` • `Feature Engineering` • `Exploratory Data Analysis` • `Business Analysis` • `Data Storytelling`
 
 ---
 
 ## Presentation
 
-Project presentation:
+Presentation available here:
 
 https://prezi.com/view/f7Zwson0MK917JGcmDsi/?referral_token=WiGIBmlnB3FN
